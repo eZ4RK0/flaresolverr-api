@@ -1,0 +1,37 @@
+{
+  "name": "flaresolverr-api",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "pnpm run build"
+  },
+  "keywords": [
+    "flaresolverr",
+    "cloudflare",
+    "scraping",
+    "api",
+    "client"
+  ],
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "axios": "^1.10.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "displayName": "FlareSolverr API",
+  "description": "A FlareSolverr client typescript friendly for Node.js",
+  "version": "0.1.0",
+  "author": "eZ4RK0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eZ4RK0/flaresolverr-api.git"
+  },
+  "readme": "https://github.com/eZ4RK0/flaresolverr-api#readme",
+  "files": [
+    "dist"
+  ]
+}
+
