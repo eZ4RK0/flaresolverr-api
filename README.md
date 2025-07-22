@@ -1,4 +1,4 @@
-# FlareSolverr API
+# FlareSolverr Client
 
 A TypeScript client API to easily communicate with [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr), a headless browser-based anti-bot bypass tool.
 
@@ -15,15 +15,15 @@ A TypeScript client API to easily communicate with [FlareSolverr](https://github
 ## 📦 Installation
 
 ```bash
-npm install flaresolverr-api
+npm install flaresolverr-client
 # or
-pnpm add flaresolverr-api
+pnpm add flaresolverr-client
 ```
 
 ## 🛠️ Usage
 
 ```ts
-import { FlareSolverrClient } from 'flaresolverr-api';
+import { FlareSolverrClient } from 'flaresolverr-client';
 
 const flaresolverr = new FlareSolverrClient('http://localhost:8191');
 
@@ -68,12 +68,12 @@ new FlareSolverrClient(baseURL: string)
 
 ### Available types
 
-All types (requests, responses, cookies, proxies, etc.) are exported from `flaresolverr-api`.
+All types (requests, responses, cookies, proxies, etc.) are exported from `flaresolverr-client`.
 
 Examples:
 
 ```ts
-import type { V1Request, V1Response, Status } from 'flaresolverr-api';
+import type { V1Request, V1Response, Status } from 'flaresolverr-client';
 ```
 
 ## ✅ Supported requests

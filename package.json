@@ -1,5 +1,5 @@
 {
-  "name": "flaresolverr-api",
+  "name": "flaresolverr-client",
   "scripts": {
     "build": "tsc",
     "prepare": "pnpm run build"
@@ -27,11 +27,10 @@
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/eZ4RK0/flaresolverr-api.git"
+    "url": "git+https://github.com/eZ4RK0/flaresolverr-client.git"
   },
-  "readme": "https://github.com/eZ4RK0/flaresolverr-api#readme",
+  "readme": "https://github.com/eZ4RK0/flaresolverr-client#readme",
   "files": [
     "dist"
   ]
 }
-
