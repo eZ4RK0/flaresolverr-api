@@ -8,6 +8,7 @@ type FlareSolverrClientType = InstanceType<typeof FlareSolverrClient>;
 
 export class SessionsManager {
   private _isDestroyed = false;
+  private resetDebounce: ReturnType<typeof debounce> | null = null;
 
   /**
    * Creates a new instance of the SessionsManager class.
@@ -22,7 +23,7 @@ export class SessionsManager {
     if (ttl) {
       if (ttl < 0) throw new Error('TTL must be a positive number');
       if (ttl == 0 || ttl == Infinity) return; // No debounce
-      debounce(this.destroy.bind(this), ttl * 1000);
+      this.resetDebounce = debounce(this.destroy.bind(this), ttl * 1000);
     }
   }
 
@@ -41,6 +42,7 @@ export class SessionsManager {
     data?: OmitSelfManagedData<V1RequestIndex[Routes.DestroySession]>
   ): ReturnType<FlareSolverrClientType['destroySession']> {
     if (this._isDestroyed) throw new Error('Session already destroyed');
+    this.resetDebounce?.();
     const res = await this.flareSolverr.destroySession({ ...data, session: this.sessionId });
     this._isDestroyed = true;
     return res;
@@ -57,6 +59,7 @@ export class SessionsManager {
     data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]>
   ): ReturnType<FlareSolverrClientType['requestGet']> {
     if (this._isDestroyed) throw new Error('Session already destroyed');
+    this.resetDebounce?.();
     return this.flareSolverr.requestGet({ ...data, session: this.sessionId });
   }
 
@@ -71,6 +74,7 @@ export class SessionsManager {
     data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>
   ): ReturnType<FlareSolverrClientType['requestPost']> {
     if (this._isDestroyed) throw new Error('Session already destroyed');
+    this.resetDebounce?.();
     return this.flareSolverr.requestPost({ ...data, session: this.sessionId });
   }
 }
