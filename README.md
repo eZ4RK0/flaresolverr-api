@@ -30,20 +30,22 @@ const flaresolverr = new FlareSolverrClient('http://localhost:8191');
 // Check the health of the service
 await flaresolverr.health();
 
-// Create a browser session
-const session = await flaresolverr.createSession();
+// Create a session manager (with optional TTL in seconds)
+const sessionManager = flaresolverr.createSession({ tll: 60 }, true); // 60s TTL
+
+// Perform a GET request via the session
+const getResult = await sessionManager.requestGet({ url: 'https://example.com' });
+console.log(getResult.solution.response);
+
+// Destroy the session
+await sessionManager.destroy();
 
 // Perform a GET request
 const result = await flaresolverr.requestGet({
-  session: session.session,
-  url: 'https://example.com',
-  cookies: []
+  url: 'https://example.com'
 });
 
 console.log(result.solution.response);
-
-// Destroy the session
-await flaresolverr.destroySession({ session: session.session });
 ```
 
 ## 📚 API
@@ -52,6 +54,7 @@ await flaresolverr.destroySession({ session: session.session });
 
 ```ts
 new FlareSolverrClient(baseURL: string)
+new SessionsManager(sessionId: string, flareSolverr: FlareSolverrClient, ttl?: number)
 ```
 
 ### Available methods
@@ -69,6 +72,8 @@ new FlareSolverrClient(baseURL: string)
 ### Available types
 
 All types (requests, responses, cookies, proxies, etc.) are exported from `flaresolverr-client`.
+
+`SessionsManager` provides typed methods for session-based requests and lifecycle management.
 
 Examples:
 

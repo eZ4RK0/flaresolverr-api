@@ -121,7 +121,7 @@ export class FlareSolverrClient {
   ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionsManager> {
     const { tll, ...restData } = data;
     const res = await this.handleV1Request(Routes.CreateSession, restData);
-    return wrapManager ? new SessionsManager(res.session, this, tll) : res;
+    return wrapManager || tll ? new SessionsManager(res.session, this, tll) : res;
   }
 
   /**
@@ -178,3 +178,4 @@ export class FlareSolverrClient {
 }
 
 export * from './types';
+export { SessionsManager } from './sessionsManager';

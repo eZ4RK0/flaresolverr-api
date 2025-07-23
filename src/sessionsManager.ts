@@ -7,7 +7,7 @@ type OmitSelfManagedData<T extends V1Request> = Omit<T, 'cmd' | 'session'>;
 type FlareSolverrClientType = InstanceType<typeof FlareSolverrClient>;
 
 export class SessionsManager {
-  private isDestroyed = false;
+  private _isDestroyed = false;
 
   /**
    * Creates a new instance of the SessionsManager class.
@@ -26,6 +26,10 @@ export class SessionsManager {
     }
   }
 
+  public get isDestroyed(): boolean {
+    return this._isDestroyed;
+  }
+
   /**
    * Destroys this session.
    * Endpoint: POST /v1 (cmd: sessions.destroy)
@@ -36,9 +40,9 @@ export class SessionsManager {
   public async destroy(
     data?: OmitSelfManagedData<V1RequestIndex[Routes.DestroySession]>
   ): ReturnType<FlareSolverrClientType['destroySession']> {
-    if (this.isDestroyed) throw new Error('Session already destroyed');
+    if (this._isDestroyed) throw new Error('Session already destroyed');
     const res = await this.flareSolverr.destroySession({ ...data, session: this.sessionId });
-    this.isDestroyed = true;
+    this._isDestroyed = true;
     return res;
   }
 
@@ -52,7 +56,7 @@ export class SessionsManager {
   public async requestGet(
     data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]>
   ): ReturnType<FlareSolverrClientType['requestGet']> {
-    if (this.isDestroyed) throw new Error('Session already destroyed');
+    if (this._isDestroyed) throw new Error('Session already destroyed');
     return this.flareSolverr.requestGet({ ...data, session: this.sessionId });
   }
 
@@ -66,7 +70,7 @@ export class SessionsManager {
   public async requestPost(
     data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>
   ): ReturnType<FlareSolverrClientType['requestPost']> {
-    if (this.isDestroyed) throw new Error('Session already destroyed');
+    if (this._isDestroyed) throw new Error('Session already destroyed');
     return this.flareSolverr.requestPost({ ...data, session: this.sessionId });
   }
 }
