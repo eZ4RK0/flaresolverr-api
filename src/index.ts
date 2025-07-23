@@ -111,17 +111,17 @@ export class FlareSolverrClient {
    * @throws Formatted error if the API returns an error.
    */
   public async createSession(
-    data?: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { tll?: number },
+    data?: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { ttl?: number },
     wrapManager?: true
   ): Promise<SessionsManager>;
 
   public async createSession(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { tll?: number } = {},
+    data: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { ttl?: number } = {},
     wrapManager?: boolean
   ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionsManager> {
-    const { tll, ...restData } = data;
+    const { ttl, ...restData } = data;
     const res = await this.handleV1Request(Routes.CreateSession, restData);
-    return wrapManager || tll ? new SessionsManager(res.session, this, tll) : res;
+    return wrapManager || ttl ? new SessionsManager(res.session, this, ttl) : res;
   }
 
   /**

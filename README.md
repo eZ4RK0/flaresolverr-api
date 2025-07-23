@@ -31,7 +31,7 @@ const flaresolverr = new FlareSolverrClient('http://localhost:8191');
 await flaresolverr.health();
 
 // Create a session manager (with optional TTL in seconds)
-const sessionManager = flaresolverr.createSession({ tll: 60 }, true); // 60s TTL
+const sessionManager = flaresolverr.createSession({ ttl: 60 }, true); // 60s TTL
 
 // Perform a GET request via the session
 const getResult = await sessionManager.requestGet({ url: 'https://example.com' });

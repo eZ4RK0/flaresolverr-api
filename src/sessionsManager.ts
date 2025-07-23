@@ -13,16 +13,16 @@ export class SessionsManager {
    * Creates a new instance of the SessionsManager class.
    * @param sessionId Unique identifier for the session.
    * @param flareSolverr Instance of FlareSolverrClient to manage requests.
-   * @param tll Time to live for the session in seconds (debounced time). If not provided, the session will not be destroyed automatically.
-   * If tll is 0 or Infinity, the session will not be destroyed automatically.
+   * @param ttl Time to live for the session in seconds (debounced time). If not provided, the session will not be destroyed automatically.
+   * If ttl is 0 or Infinity, the session will not be destroyed automatically.
    * @returns A new instance of SessionsManager.
-   * @throws Error if tll is a negative number.
+   * @throws Error if ttl is a negative number.
    */
-  constructor(private sessionId: string, private flareSolverr: FlareSolverrClient, tll?: number) {
-    if (tll) {
-      if (tll < 0) throw new Error('TTL must be a positive number');
-      if (tll == 0 || tll == Infinity) return; // No debounce
-      debounce(this.destroy.bind(this), tll * 1000);
+  constructor(private sessionId: string, private flareSolverr: FlareSolverrClient, ttl?: number) {
+    if (ttl) {
+      if (ttl < 0) throw new Error('TTL must be a positive number');
+      if (ttl == 0 || ttl == Infinity) return; // No debounce
+      debounce(this.destroy.bind(this), ttl * 1000);
     }
   }
 
