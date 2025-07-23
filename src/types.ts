@@ -247,9 +247,9 @@ interface V1Response_ResponseGet<CookiesOnly extends boolean = false> extends V1
     /** Code de statut HTTP. */
     status: number;
     /** En-têtes HTTP. */
-    headers: CookiesOnly extends true ? Record<string, string | undefined> : undefined;
+    headers: CookiesOnly extends false ? Record<string, string | undefined> : undefined;
     /** HTML complet de la page. */
-    response: CookiesOnly extends true ? string : undefined;
+    response: CookiesOnly extends false ? string : undefined;
     /** Cookies extraits du navigateur. */
     cookies: Cookie[];
     /** User-Agent utilisé. */
@@ -260,17 +260,17 @@ interface V1Response_ResponseGet<CookiesOnly extends boolean = false> extends V1
 /**
  * Réponse à une requête POST (request.post).
  */
-interface V1Response_ResponsePost extends V1Response_ResponseGet {}
+interface V1Response_ResponsePost<CookiesOnly extends boolean = false> extends V1Response_ResponseGet<CookiesOnly> {}
 
 /**
  * Index des types de réponses.
  */
-export interface V1ResponseIndex {
+export interface V1ResponseIndex<OnlyCookies extends boolean = false> {
   [Routes.CreateSession]: V1Response_CreateSession;
   [Routes.ListSessions]: V1Response_ListSessions;
   [Routes.DestroySession]: V1Response_DestroySession;
-  [Routes.RequestGet]: V1Response_ResponseGet;
-  [Routes.RequestPost]: V1Response_ResponsePost;
+  [Routes.RequestGet]: V1Response_ResponseGet<OnlyCookies>;
+  [Routes.RequestPost]: V1Response_ResponsePost<OnlyCookies>;
 }
 
 /**

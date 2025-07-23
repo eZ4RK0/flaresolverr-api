@@ -12,6 +12,12 @@ import { SessionsManager } from './sessionsManager';
 
 type OmitSelfManagedData<T extends V1Request> = Omit<T, 'cmd'>;
 
+type DataV1RequestHandler<Route extends Routes, OnlyCookies extends boolean = false> = Route extends
+  | Routes.RequestGet
+  | Routes.RequestPost
+  ? OmitSelfManagedData<V1RequestIndex[Route]> & { returnOnlyCookies?: OnlyCookies }
+  : OmitSelfManagedData<V1RequestIndex[Route]>;
+
 export class FlareSolverrClient {
   private client: AxiosInstance;
 
@@ -47,12 +53,12 @@ export class FlareSolverrClient {
    * Sends a POST request to the /v1 endpoint with the specified command and associated data.
    * Centralizes the management of FlareSolverr v1 commands.
    */
-  private async handleV1Request<Route extends Routes>(
+  private async handleV1Request<Route extends Routes, OnlyCookies extends boolean = false>(
     cmd: Route,
-    data: OmitSelfManagedData<V1RequestIndex[Route]>
-  ): Promise<V1ResponseIndex[Route] | never> {
+    data: DataV1RequestHandler<Route, OnlyCookies>
+  ): Promise<V1ResponseIndex<OnlyCookies>[Route] | never> {
     try {
-      const res = await this.client.post<V1ResponseIndex[Route]>('/v1', {
+      const res = await this.client.post<V1ResponseIndex<OnlyCookies>[Route]>('/v1', {
         cmd,
         maxTimeout: data.maxTimeout ?? this.maxTimeout,
         ...data
@@ -157,9 +163,9 @@ export class FlareSolverrClient {
    * @returns V1ResponseIndex[Routes.RequestGet] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
-  public async requestGet(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]>
-  ): Promise<V1ResponseIndex[Routes.RequestGet]> {
+  public async requestGet<OnlyCookies extends boolean = false>(
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]> & { returnOnlyCookies?: OnlyCookies }
+  ): Promise<V1ResponseIndex<OnlyCookies>[Routes.RequestGet]> {
     return this.handleV1Request(Routes.RequestGet, data);
   }
 
@@ -170,9 +176,9 @@ export class FlareSolverrClient {
    * @returns V1ResponseIndex[Routes.RequestPost] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
-  public async requestPost(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>
-  ): Promise<V1ResponseIndex[Routes.RequestPost]> {
+  public async requestPost<OnlyCookies extends boolean = false>(
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]> & { returnOnlyCookies?: OnlyCookies }
+  ): Promise<V1ResponseIndex<OnlyCookies>[Routes.RequestPost]> {
     return this.handleV1Request(Routes.RequestPost, data);
   }
 }
