@@ -94,14 +94,30 @@ export class FlareSolverrClient {
   /**
    * Creates a persistent browser session.
    * Endpoint: POST /v1 (cmd: sessions.create)
-   * @param data Session creation data (V1RequestIndex[Routes.CreateSession] exempt of cmd) and session TTL
-   * @param wrapManager If true, returns a SessionsManager instance. If false, returns the response.
-   * @returns V1ResponseIndex[Routes.CreateSession] with the session ID and message or a SessionsManager instance.
+   * @param data Session creation data (V1RequestIndex[Routes.CreateSession] exempt of cmd).
+   * @returns V1ResponseIndex[Routes.CreateSession] with the session ID and message
    * @throws Formatted error if the API returns an error.
    */
   public async createSession(
+    data?: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]>
+  ): Promise<V1ResponseIndex[Routes.CreateSession]>;
+
+  /**
+   * Creates a persistent browser session.
+   * Endpoint: POST /v1 (cmd: sessions.create)
+   * @param data Session creation data (V1RequestIndex[Routes.CreateSession] exempt of cmd) and session TTL
+   * @param wrapManager If true, returns a SessionsManager instance. If false, returns the response.
+   * @returns A SessionsManager instance.
+   * @throws Formatted error if the API returns an error.
+   */
+  public async createSession(
+    data?: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { tll?: number },
+    wrapManager?: true
+  ): Promise<SessionsManager>;
+
+  public async createSession(
     data: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { tll?: number } = {},
-    wrapManager: boolean = true
+    wrapManager?: boolean
   ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionsManager> {
     const { tll, ...restData } = data;
     const res = await this.handleV1Request(Routes.CreateSession, restData);
