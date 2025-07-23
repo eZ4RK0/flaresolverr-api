@@ -1,12 +1,12 @@
 import { debounce } from 'lodash';
-import { Routes, V1Request, V1RequestIndex } from './types';
+import { Routes, V1Request, V1RequestIndex, V1ResponseIndex } from './types';
 import { FlareSolverrClient } from './index';
 
 type OmitSelfManagedData<T extends V1Request> = Omit<T, 'cmd' | 'session'>;
 
 type FlareSolverrClientType = InstanceType<typeof FlareSolverrClient>;
 
-export class SessionsManager {
+export class SessionManager {
   private _isDestroyed = false;
   private resetDebounce: ReturnType<typeof debounce> | null = null;
 
@@ -55,12 +55,12 @@ export class SessionsManager {
    * @returns V1ResponseIndex[Routes.RequestGet] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
-  public async requestGet(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]>
-  ): ReturnType<FlareSolverrClientType['requestGet']> {
+  public async requestGet<OnlyCookies extends boolean = false>(
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]> & { returnOnlyCookies?: OnlyCookies }
+  ): Promise<V1ResponseIndex<OnlyCookies>[Routes.RequestGet]> {
     if (this._isDestroyed) throw new Error('Session already destroyed');
     this.resetDebounce?.();
-    return this.flareSolverr.requestGet({ ...data, session: this.sessionId });
+    return this.flareSolverr.requestGet<OnlyCookies>({ ...data, session: this.sessionId });
   }
 
   /**
@@ -70,11 +70,11 @@ export class SessionsManager {
    * @returns V1ResponseIndex[Routes.RequestPost] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
-  public async requestPost(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>
-  ): ReturnType<FlareSolverrClientType['requestPost']> {
+  public async requestPost<OnlyCookies extends boolean = false>(
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]> & { returnOnlyCookies?: OnlyCookies }
+  ): Promise<V1ResponseIndex<OnlyCookies>[Routes.RequestPost]> {
     if (this._isDestroyed) throw new Error('Session already destroyed');
     this.resetDebounce?.();
-    return this.flareSolverr.requestPost({ ...data, session: this.sessionId });
+    return this.flareSolverr.requestPost<OnlyCookies>({ ...data, session: this.sessionId });
   }
 }

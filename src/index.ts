@@ -8,7 +8,7 @@ import {
   V1ResponseError,
   V1ResponseIndex
 } from './types';
-import { SessionsManager } from './sessionsManager';
+import { SessionManager } from './sessionManager';
 
 type OmitSelfManagedData<T extends V1Request> = Omit<T, 'cmd'>;
 
@@ -119,15 +119,15 @@ export class FlareSolverrClient {
   public async createSession(
     data?: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { ttl?: number },
     wrapManager?: true
-  ): Promise<SessionsManager>;
+  ): Promise<SessionManager>;
 
   public async createSession(
     data: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { ttl?: number } = {},
     wrapManager?: boolean
-  ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionsManager> {
+  ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionManager> {
     const { ttl, ...restData } = data;
     const res = await this.handleV1Request(Routes.CreateSession, restData);
-    return wrapManager || ttl ? new SessionsManager(res.session, this, ttl) : res;
+    return wrapManager || ttl ? new SessionManager(res.session, this, ttl) : res;
   }
 
   /**
@@ -184,4 +184,4 @@ export class FlareSolverrClient {
 }
 
 export * from './types';
-export { SessionsManager } from './sessionsManager';
+export { SessionManager as SessionsManager } from './sessionManager';
