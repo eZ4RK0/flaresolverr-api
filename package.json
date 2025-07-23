@@ -12,16 +12,20 @@
     "client"
   ],
   "license": "ISC",
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "axios": "^1.10.0"
+    "axios": "^1.10.0",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
+  "devDependencies": {
+    "@types/lodash": "^4.17.20"
+  },
   "displayName": "FlareSolverr API",
   "description": "A FlareSolverr client typescript friendly for Node.js",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "author": "eZ4RK0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -34,3 +38,4 @@
     "dist"
   ]
 }
+

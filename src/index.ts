@@ -8,12 +8,19 @@ import {
   V1ResponseError,
   V1ResponseIndex
 } from './types';
+import { SessionsManager } from './sessionsManager';
 
-type OmitCmd<T extends V1Request> = Omit<T, 'cmd'>;
+type OmitSelfManagedData<T extends V1Request> = Omit<T, 'cmd'>;
 
 export class FlareSolverrClient {
   private client: AxiosInstance;
 
+  /**
+   * Creates a new instance of the FlareSolverrClient class.
+   * @param baseURL Base URL of the FlareSolverr API.
+   * @param maxTimeout Maximum timeout for requests in milliseconds (default: 60000).
+   * @throws Error if the baseURL is invalid.
+   */
   constructor(baseURL: string, private maxTimeout: number = 60000) {
     this.client = axios.create({ baseURL });
   }
@@ -42,7 +49,7 @@ export class FlareSolverrClient {
    */
   private async handleV1Request<Route extends Routes>(
     cmd: Route,
-    data: OmitCmd<V1RequestIndex[Route]>
+    data: OmitSelfManagedData<V1RequestIndex[Route]>
   ): Promise<V1ResponseIndex[Route] | never> {
     try {
       const res = await this.client.post<V1ResponseIndex[Route]>('/v1', {
@@ -64,8 +71,7 @@ export class FlareSolverrClient {
    */
   public async index(): Promise<IndexResponse> {
     try {
-      const res = await this.client.get<IndexResponse>('/');
-      return res.data;
+      return (await this.client.get<IndexResponse>('/')).data;
     } catch (error) {
       this.handleApiError(error);
     }
@@ -79,8 +85,7 @@ export class FlareSolverrClient {
    */
   public async health(): Promise<HealthResponse> {
     try {
-      const res = await this.client.get<HealthResponse>('/health');
-      return res.data;
+      return (await this.client.get<HealthResponse>('/health')).data;
     } catch (error) {
       this.handleApiError(error);
     }
@@ -89,25 +94,29 @@ export class FlareSolverrClient {
   /**
    * Creates a persistent browser session.
    * Endpoint: POST /v1 (cmd: sessions.create)
-   * @param data Session creation data (V1RequestIndex[Routes.CreateSession])
-   * @returns V1ResponseIndex[Routes.CreateSession] with the session ID and message.
+   * @param data Session creation data (V1RequestIndex[Routes.CreateSession] exempt of cmd) and session TTL
+   * @param wrapManager If true, returns a SessionsManager instance. If false, returns the response.
+   * @returns V1ResponseIndex[Routes.CreateSession] with the session ID and message or a SessionsManager instance.
    * @throws Formatted error if the API returns an error.
    */
   public async createSession(
-    data: OmitCmd<V1RequestIndex[Routes.CreateSession]> = {}
-  ): Promise<V1ResponseIndex[Routes.CreateSession]> {
-    return this.handleV1Request(Routes.CreateSession, data);
+    data: OmitSelfManagedData<V1RequestIndex[Routes.CreateSession]> & { tll?: number } = {},
+    wrapManager: boolean = true
+  ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionsManager> {
+    const { tll, ...restData } = data;
+    const res = await this.handleV1Request(Routes.CreateSession, restData);
+    return wrapManager ? new SessionsManager(res.session, this, tll) : res;
   }
 
   /**
    * Lists all active sessions.
    * Endpoint: POST /v1 (cmd: sessions.list)
-   * @param data Request data (V1RequestIndex[Routes.ListSessions])
+   * @param data Request data (V1RequestIndex[Routes.ListSessions] exempt of cmd)
    * @returns V1ResponseIndex[Routes.ListSessions] with the list of active sessions.
    * @throws Formatted error if the API returns an error.
    */
   public async listSessions(
-    data: OmitCmd<V1RequestIndex[Routes.ListSessions]> = {}
+    data: OmitSelfManagedData<V1RequestIndex[Routes.ListSessions]> = {}
   ): Promise<V1ResponseIndex[Routes.ListSessions]> {
     return this.handleV1Request(Routes.ListSessions, data);
   }
@@ -115,12 +124,12 @@ export class FlareSolverrClient {
   /**
    * Destroys an existing session.
    * Endpoint: POST /v1 (cmd: sessions.destroy)
-   * @param data Request data (V1RequestIndex[Routes.DestroySession])
+   * @param data Request data (V1RequestIndex[Routes.DestroySession] exempt of cmd)
    * @returns V1ResponseIndex[Routes.DestroySession] with the confirmation message.
    * @throws Formatted error if the API returns an error.
    */
   public async destroySession(
-    data: OmitCmd<V1RequestIndex[Routes.DestroySession]>
+    data: OmitSelfManagedData<V1RequestIndex[Routes.DestroySession]>
   ): Promise<V1ResponseIndex[Routes.DestroySession]> {
     return this.handleV1Request(Routes.DestroySession, data);
   }
@@ -128,12 +137,12 @@ export class FlareSolverrClient {
   /**
    * Performs a GET request via the browser.
    * Endpoint: POST /v1 (cmd: request.get)
-   * @param data Request data (V1RequestIndex[Routes.RequestGet])
+   * @param data Request data (V1RequestIndex[Routes.RequestGet] exempt of cmd)
    * @returns V1ResponseIndex[Routes.RequestGet] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
   public async requestGet(
-    data: OmitCmd<V1RequestIndex[Routes.RequestGet]>
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestGet]>
   ): Promise<V1ResponseIndex[Routes.RequestGet]> {
     return this.handleV1Request(Routes.RequestGet, data);
   }
@@ -141,12 +150,12 @@ export class FlareSolverrClient {
   /**
    * Performs a POST request via the browser.
    * Endpoint: POST /v1 (cmd: request.post)
-   * @param data Request data (V1RequestIndex[Routes.RequestPost])
+   * @param data Request data (V1RequestIndex[Routes.RequestPost] exempt of cmd)
    * @returns V1ResponseIndex[Routes.RequestPost] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
   public async requestPost(
-    data: OmitCmd<V1RequestIndex[Routes.RequestPost]>
+    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>
   ): Promise<V1ResponseIndex[Routes.RequestPost]> {
     return this.handleV1Request(Routes.RequestPost, data);
   }
