@@ -18,6 +18,11 @@ type DataV1RequestHandler<Route extends Routes, OnlyCookies extends boolean = fa
   ? OmitSelfManagedData<V1RequestIndex[Route]> & { returnOnlyCookies?: OnlyCookies }
   : OmitSelfManagedData<V1RequestIndex[Route]>;
 
+function parsePostData(data: Record<string, string>): string {
+  const entires = Object.entries(data);
+  return entires.map(([key, value]) => `${key}=${value}`).join('&');
+}
+
 export class FlareSolverrClient {
   private client: AxiosInstance;
 
@@ -38,12 +43,14 @@ export class FlareSolverrClient {
     if (error instanceof AxiosError && error.response) {
       const apiError = error.response.data as V1ResponseError;
       throw new Error(
-        `[FlareSolverr Error] ${apiError.status}: ${apiError.message || 'Unknown error'}\n-> Start at: ${new Date(
+        `[FlareSolverr Error] ${apiError.message || 'Unknown error'}\n-> Start at: ${new Date(
           apiError.startTimestamp
         ).toString()}\n-> End at: ${new Date(apiError.endTimestamp).toString()}\n-> Version: ${apiError.version}`
       );
     } else if (error instanceof Error) {
-      throw new Error(`[FlareSolverr Error] ${error.message || 'Unknown error'}`);
+      throw new Error(
+        `[FlareSolverr Error] ${error.name || 'Unknown error'}\n${error.stack || 'No stack trace available'}`
+      );
     } else {
       throw error;
     }
@@ -127,7 +134,7 @@ export class FlareSolverrClient {
   ): Promise<V1ResponseIndex[Routes.CreateSession] | SessionManager> {
     const { ttl, ...restData } = data;
     const res = await this.handleV1Request(Routes.CreateSession, restData);
-    return wrapManager || ttl ? new SessionManager(res.session, this, ttl) : res;
+    return wrapManager ? new SessionManager(res.session, this, ttl) : res;
   }
 
   /**
@@ -172,14 +179,17 @@ export class FlareSolverrClient {
   /**
    * Performs a POST request via the browser.
    * Endpoint: POST /v1 (cmd: request.post)
-   * @param data Request data (V1RequestIndex[Routes.RequestPost] exempt of cmd)
+   * @param data Request data (V1RequestIndex[Routes.RequestPost] exempt of cmd and a simplified postData)
    * @returns V1ResponseIndex[Routes.RequestPost] with the challenge or navigation result.
    * @throws Formatted error if the API returns an error.
    */
   public async requestPost<OnlyCookies extends boolean = false>(
-    data: OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]> & { returnOnlyCookies?: OnlyCookies }
+    data: Omit<OmitSelfManagedData<V1RequestIndex[Routes.RequestPost]>, 'postData'> & {
+      postData: Record<string, string>;
+      returnOnlyCookies?: OnlyCookies;
+    }
   ): Promise<V1ResponseIndex<OnlyCookies>[Routes.RequestPost]> {
-    return this.handleV1Request(Routes.RequestPost, data);
+    return this.handleV1Request(Routes.RequestPost, { ...data, postData: parsePostData(data.postData) });
   }
 }
 

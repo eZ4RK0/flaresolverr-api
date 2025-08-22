@@ -20,12 +20,9 @@
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
-  "devDependencies": {
-    "@types/lodash": "^4.17.20"
-  },
   "displayName": "FlareSolverr API",
   "description": "A FlareSolverr client typescript friendly for Node.js",
-  "version": "1.0.6",
+  "version": "1.2.0",
   "author": "eZ4RK0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,5 +33,9 @@
   "readme": "https://github.com/eZ4RK0/flaresolverr-client#readme",
   "files": [
     "dist"
-  ]
+  ],
+  "devDependencies": {
+    "@types/lodash": "^4.17.20"
+  }
 }
+

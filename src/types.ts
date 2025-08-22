@@ -130,7 +130,7 @@ interface V1Request_RequestPost extends V1Request_RequestBase {
   /** Commande request.post. */
   cmd: Routes.RequestPost;
   /** Données */
-  postData: { name: string; value: string }[]; //! Must be converted to string (name=value&name2=value2)
+  postData: string;
 }
 
 /**
@@ -203,7 +203,6 @@ export interface V1ResponseError extends V1ResponseBase {
   status: Status.ERROR;
 }
 
-//TODO: Ajouter dans la class isNew pour replacer le message
 /**
  * Réponse à la création de session (sessions.create).
  * Message indique si la session existait déjà ou a été créée.
